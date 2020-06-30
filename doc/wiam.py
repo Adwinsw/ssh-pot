@@ -89,10 +89,10 @@ p = l['source_ip']
 try:
 d = l['date']
 except:
-d = "no date available"
+d = "no date Miladilable"
 oct1, oct2, oct3, oct4 = [int(i) for i in p.split('.')] #split IP so we can check for private addr
 if oct1 == 192 and oct2 == 168 or oct1 == 172 and oct2 in range(16, 32) or oct1 == 10: #check for private addr
-print "Private ip attack, %s No geolocation available" % str(p)
+print "Private ip attack, %s No geolocation Miladilable" % str(p)
 if attacks.has_key(p): #if not private do geolocate
 attacks[p] = attacks.get(p, 0)+ 1
 countryRecord(p)

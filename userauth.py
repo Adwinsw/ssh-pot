@@ -18,7 +18,7 @@ from general import insertSysLog
 import datetime
 
 
-class AvaSSHAuthServer(SSHUserAuthServer):	
+class MiladSSHAuthServer(SSHUserAuthServer):
     """
     A service implementing the server side of the 'ssh-userauth' service.  It
     is used to authenticate the user on the other side as being able to access
@@ -113,11 +113,11 @@ class AvaSSHAuthServer(SSHUserAuthServer):
     def timeoutAuthentication(self):
         """
         Called when the user has timed out on authentication.  Disconnect
-        with a DISCONNECT_NO_MORE_AUTH_METHODS_AVAILABLE message.
+        with a DISCONNECT_NO_MORE_AUTH_METHODS_MiladILABLE message.
         """
         self._cancelLoginTimeout = None
         self.transport.sendDisconnect(
-            transport.DISCONNECT_NO_MORE_AUTH_METHODS_AVAILABLE,
+            transport.DISCONNECT_NO_MORE_AUTH_METHODS_MiladILABLE,
             'you took too long')
 
 
@@ -181,13 +181,13 @@ class AvaSSHAuthServer(SSHUserAuthServer):
         return d
 
 
-    def _cbFinishedAuth(self, (interface, avatar, logout)):
+    def _cbFinishedAuth(self, (interface, Miladtar, logout)):
         """
         The callback when user has successfully been authenticated.  For a
         description of the arguments, see L{twisted.cred.portal.Portal.login}.
         We start the service requested by the user.
         """
-        self.transport.avatar = avatar
+        self.transport.Miladtar = Miladtar
         self.transport.logoutFunction = logout
         service = self.transport.factory.getService(self.transport,
                 self.nextService)
@@ -236,7 +236,7 @@ class AvaSSHAuthServer(SSHUserAuthServer):
             self.loginAttempts += 1
             if self.loginAttempts > self.attemptsBeforeDisconnect:
                 self.transport.sendDisconnect(
-                        transport.DISCONNECT_NO_MORE_AUTH_METHODS_AVAILABLE,
+                        transport.DISCONNECT_NO_MORE_AUTH_METHODS_MiladILABLE,
                         'too many bad auths')
                 return
         self.transport.sendPacket(
@@ -380,11 +380,11 @@ class AvaSSHAuthServer(SSHUserAuthServer):
             auth.status = False
         auth.timestamp = attacked_time
         auth.save()
-        syslog_msg ='date={date} time={time} AvaPotProtocol={AvaPotProtocol} ip={ip} type_cmd={type_cmd} username={username}'\
+        syslog_msg ='date={date} time={time} MiladPotProtocol={MiladPotProtocol} ip={ip} type_cmd={type_cmd} username={username}'\
                 'password={password}  status={status} command={command}\n'\
             .format(date=datetime.datetime.fromtimestamp(attacked_time).strftime('%Y-%m-%d'),
                     time=datetime.datetime.fromtimestamp(attacked_time).strftime('%H:%M:%S'),
-                    AvaPotProtocol='ssh',
+                    MiladPotProtocol='ssh',
                     ip=self.transport.transport.getPeer().host,
                     type_cmd="auth",
                     username=self.user,

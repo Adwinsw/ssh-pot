@@ -22,12 +22,12 @@ class InDataBaseChecker(object):
         else:
             return failure.Failure(error.UnauthorizedLogin())
 
-    def requestAvatarId(self, credentials):
+    def requestMiladtarId(self, credentials):
         return SSHFakeUser.find(
             where=['username = ?', credentials.username], limit=1
-            ).addCallback(self.continue_requestAvatarId, credentials)
+            ).addCallback(self.continue_requestMiladtarId, credentials)
 
-    def continue_requestAvatarId(self, user, credentials):
+    def continue_requestMiladtarId(self, user, credentials):
         if user:
             return defer.maybeDeferred(
                 credentials.checkPassword,

@@ -1,10 +1,10 @@
 from utilz.daemon import Daemon
 from ssh.server import *
 
-class AvapotSSHService(Daemon):
+class MiladpotSSHService(Daemon):
     def run(self):
-	    sshFactory = AvaSSHFactory()
-	    sshFactory.portal = portal.Portal(AvaSSHRealm())
+	    sshFactory = MiladSSHFactory()
+	    sshFactory.portal = portal.Portal(MiladSSHRealm())
 	    sshFactory.portal.registerChecker(InDataBaseChecker())
 	    # pubKey, privKey = getRSAKeys()
 	    # sshFactory.publicKeys = {'ssh-rsa': pubKey}

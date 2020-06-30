@@ -6,7 +6,7 @@ from twisted.protocols.policies import TimeoutMixin
 from twisted.cred import portal
 from twisted.conch.ssh import factory, connection, keys, session, transport
 from zope.interface import implements
-from twisted.conch import avatar, recvline
+from twisted.conch import Miladtar, recvline
 from twisted.conch.ssh.transport import SSHCiphers
 from twisted.conch.interfaces import IConchUser, ISession
 from twisted.conch.insults import insults
@@ -17,7 +17,7 @@ from twisted.python import log, randbytes
 from twisted.conch.ssh.common import NS, getNS, MP, getMP, _MPpow, ffs
 # In Project things
 from consts import ssh_versions
-from userauth import AvaSSHAuthServer
+from userauth import MiladSSHAuthServer
 from checker import InDataBaseChecker
 from ssh.models import *
 from general import insertSysLog
@@ -54,7 +54,7 @@ GNU coreutils online help: <http://www.gnu.org/software/coreutils/>
 For complete documentation, run: info coreutils 'mkdir invocation'
 \n'''
 
-class AvaSSHServerTransport(transport.SSHServerTransport, TimeoutMixin):
+class MiladSSHServerTransport(transport.SSHServerTransport, TimeoutMixin):
 
     version = 'OpenSSH_6.6.1p1'
     protocolVersion = "2.0"
@@ -175,7 +175,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
 -----END RSA PRIVATE KEY-----"""
 
 
-class AvaSSHProtocol(recvline.HistoricRecvLine):
+class MiladSSHProtocol(recvline.HistoricRecvLine):
     files_list = []
     prompt = None
     ps = ('', '... ')
@@ -417,19 +417,19 @@ class AvaSSHProtocol(recvline.HistoricRecvLine):
             command.timestamp = attacked_time
             command.save()
         except Exception as e:
-            syslog_msg = 'date={date} time={time} AvaPotProtocol={AvaPotProtocol} Has Failed to Insert Into Database Because : {error}\n' \
+            syslog_msg = 'date={date} time={time} MiladPotProtocol={MiladPotProtocol} Has Failed to Insert Into Database Because : {error}\n' \
                 .format(date=datetime.datetime.fromtimestamp(attacked_time).strftime('%Y-%m-%d'),
                         time=datetime.datetime.fromtimestamp(attacked_time).strftime('%H:%M:%S'),
-                        AvaPotProtocol='ssh',
+                        MiladPotProtocol='ssh',
                         error=str(e)
                         )
             insertSysLog(syslog_msg)
         try:
-            syslog_msg ='date={date} time={time} AvaPotProtocol={AvaPotProtocol} ip={ip} type_cmd={type_cmd} username={username}'\
+            syslog_msg ='date={date} time={time} MiladPotProtocol={MiladPotProtocol} ip={ip} type_cmd={type_cmd} username={username}'\
                     'password={password}  status={status} command={command}\n'\
                 .format(date=datetime.datetime.fromtimestamp(attacked_time).strftime('%Y-%m-%d'),
                         time=datetime.datetime.fromtimestamp(attacked_time).strftime('%H:%M:%S'),
-                        AvaPotProtocol='ssh',
+                        MiladPotProtocol='ssh',
                         ip=self.client_address[0],
                         type_cmd="command",
                         username='',
@@ -556,18 +556,18 @@ class AvaSSHProtocol(recvline.HistoricRecvLine):
 
 
 def getRSAKeys():
-    with open('/opt/avapot/ssh/id_rsa') as privateBlobFile:
+    with open('/opt/Miladpot/ssh/id_rsa') as privateBlobFile:
         privateBlob = privateBlobFile.read()
         privateKey = keys.Key.fromString(data=privateBlob)
 
-    with open('/opt/avapot/ssh/id_rsa.pub') as publicBlobFile:
+    with open('/opt/Miladpot/ssh/id_rsa.pub') as publicBlobFile:
         publicBlob = publicBlobFile.read()
         publicKey = keys.Key.fromString(data=publicBlob)
 
     return publicKey, privateKey
 
-class AvaSSHFactory(factory.SSHFactory):
-    protocol = AvaSSHServerTransport
+class MiladSSHFactory(factory.SSHFactory):
+    protocol = MiladSSHServerTransport
 
     publicKeys = {
         'ssh-rsa': keys.Key.fromString(data=publicKey)
@@ -576,21 +576,21 @@ class AvaSSHFactory(factory.SSHFactory):
         'ssh-rsa': keys.Key.fromString(data=privateKey)
     }
     services = {
-        'ssh-userauth': AvaSSHAuthServer,
+        'ssh-userauth': MiladSSHAuthServer,
         'ssh-connection': connection.SSHConnection
     }
 
 
-class AvaSSHAvatar(avatar.ConchUser):
+class MiladSSHMiladtar(Miladtar.ConchUser):
     implements(ISession)
 
     def __init__(self, username):
-        avatar.ConchUser.__init__(self)
+        Miladtar.ConchUser.__init__(self)
         self.username = username
         self.channelLookup.update({'session': session.SSHSession})
 
     def openShell(self, protocol): # <<< ? koja estefade mishe ?
-        serverProtocol = insults.ServerProtocol(AvaSSHProtocol, self)
+        serverProtocol = insults.ServerProtocol(MiladSSHProtocol, self)
         serverProtocol.makeConnection(protocol)
         protocol.makeConnection(session.wrapProtocol(serverProtocol))
 
@@ -603,12 +603,12 @@ class AvaSSHAvatar(avatar.ConchUser):
     def closed(self):
         pass
 
-class AvaSSHRealm(object):
+class MiladSSHRealm(object):
     implements(portal.IRealm)
 
-    def requestAvatar(self, avatarId, mind, *interfaces):
+    def requestMiladtar(self, MiladtarId, mind, *interfaces):
         if IConchUser in interfaces:
-            return interfaces[0], AvaSSHAvatar(avatarId), lambda: None
+            return interfaces[0], MiladSSHMiladtar(MiladtarId), lambda: None
         else:
             raise NotImplementedError("No supported interfaces found.")
 
@@ -641,19 +641,19 @@ DISCONNECT_KEY_EXCHANGE_FAILED = 3
 DISCONNECT_RESERVED = 4
 DISCONNECT_MAC_ERROR = 5
 DISCONNECT_COMPRESSION_ERROR = 6
-DISCONNECT_SERVICE_NOT_AVAILABLE = 7
+DISCONNECT_SERVICE_NOT_MiladILABLE = 7
 DISCONNECT_PROTOCOL_VERSION_NOT_SUPPORTED = 8
 DISCONNECT_HOST_KEY_NOT_VERIFIABLE = 9
 DISCONNECT_CONNECTION_LOST = 10
 DISCONNECT_BY_APPLICATION = 11
 DISCONNECT_TOO_MANY_CONNECTIONS = 12
 DISCONNECT_AUTH_CANCELLED_BY_USER = 13
-DISCONNECT_NO_MORE_AUTH_METHODS_AVAILABLE = 14
+DISCONNECT_NO_MORE_AUTH_METHODS_MiladILABLE = 14
 DISCONNECT_ILLEGAL_USER_NAME = 15
 
 if __name__ == '__main__':
-    sshFactory = AvaSSHFactory()
-    sshFactory.portal = portal.Portal(AvaSSHRealm())
+    sshFactory = MiladSSHFactory()
+    sshFactory.portal = portal.Portal(MiladSSHRealm())
     sshFactory.portal.registerChecker(InDataBaseChecker())
     pubKey, privKey = getRSAKeys()
     sshFactory.publicKeys = {'ssh-rsa': pubKey}
